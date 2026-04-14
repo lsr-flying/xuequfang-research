@@ -1,22 +1,108 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <title>Document</title>
+  <title>上海嘉定区学区房研究项目</title>
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-  <meta name="description" content="Description">
+  <meta name="description" content="上海嘉定区学区房研究项目 - 2026年最新数据，专业学区房决策顾问系统">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
   <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
+  <style>
+    /* 自定义样式 */
+    .sidebar {
+      width: 300px !important;
+    }
+    .app-name {
+      font-size: 1.5em;
+      font-weight: bold;
+    }
+    .sidebar ul {
+      padding-left: 20px;
+    }
+    .sidebar li {
+      margin: 5px 0;
+    }
+    .markdown-section {
+      max-width: 1200px;
+    }
+    /* 目录项样式 */
+    .sidebar-nav li a {
+      padding: 8px 15px;
+      border-radius: 4px;
+      transition: all 0.3s;
+    }
+    .sidebar-nav li a:hover {
+      background-color: #f5f5f5;
+      color: #42b983;
+    }
+    /* 当前页面高亮 */
+    .sidebar-nav li.active > a {
+      background-color: #42b983;
+      color: white !important;
+    }
+    /* 展开/收起箭头 */
+    .sidebar-nav li > .app-sub-sidebar::before {
+      content: '📁 ';
+    }
+    .sidebar-nav li.active > .app-sub-sidebar::before {
+      content: '📂 ';
+    }
+  </style>
 </head>
 <body>
   <div id="app"></div>
   <script>
     window.$docsify = {
-      name: '',
-      repo: ''
+      name: '上海嘉定区学区房研究项目',
+      repo: 'lsr-flying/xuequfang-research',
+      loadSidebar: true,
+      subMaxLevel: 4,
+      auto2top: true,
+      search: {
+        paths: 'auto',
+        placeholder: '搜索文档...',
+        noData: '找不到相关结果',
+        depth: 4
+      },
+      plugins: [
+        function(hook, vm) {
+          hook.beforeEach(function(content) {
+            // 在每篇文章前添加更新时间
+            const updateTime = '最后更新: 2026年4月15日';
+            return '---\n' + updateTime + '\n---\n\n' + content;
+          });
+          
+          hook.doneEach(function() {
+            // 页面加载完成后添加目录展开功能
+            setTimeout(function() {
+              const currentPage = vm.route.path;
+              const sidebarItems = document.querySelectorAll('.sidebar-nav li');
+              
+              // 自动展开当前页面所在的目录
+              sidebarItems.forEach(item => {
+                const link = item.querySelector('a');
+                if (link && link.getAttribute('href') === currentPage) {
+                  let parent = item.parentElement;
+                  while (parent && parent.classList.contains('app-sub-sidebar')) {
+                    parent.style.display = 'block';
+                    parent = parent.parentElement;
+                  }
+                }
+              });
+            }, 100);
+          });
+        }
+      ]
     }
   </script>
   <!-- Docsify v4 -->
   <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
+  <!-- 搜索插件 -->
+  <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js"></script>
+  <!-- 代码高亮 -->
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-bash.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-javascript.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-json.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-yaml.min.js"></script>
 </body>
 </html>

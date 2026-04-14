@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Docsify配置测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        h1 {
+            color: #42b983;
+        }
+        .success {
+            color: green;
+            font-weight: bold;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-left: 4px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <h1>Docsify配置测试</h1>
+    
+    <div class="test-result">
+        <h3>测试1: 文件结构检查</h3>
+        <p id="test1">检查中...</p>
+    </div>
+    
+    <div class="test-result">
+        <h3>测试2: 侧边栏配置检查</h3>
+        <p id="test2">检查中...</p>
+    </div>
+    
+    <div class="test-result">
+        <h3>测试3: 导航链接检查</h3>
+        <p id="test3">检查中...</p>
+    </div>
+    
+    <div class="test-result">
+        <h3>下一步操作</h3>
+        <ul>
+            <li><a href="index.html">打开docsify主页</a></li>
+            <li><a href="_sidebar.md">查看侧边栏配置</a></li>
+            <li><a href="README.md">查看首页内容</a></li>
+        </ul>
+    </div>
+
+    <script>
+        // 测试1: 文件结构检查
+        const test1 = document.getElementById('test1');
+        const requiredFiles = ['index.html', '_sidebar.md', 'README.md'];
+        let missingFiles = [];
+        
+        requiredFiles.forEach(file => {
+            // 简单检查文件是否存在
+            fetch(file)
+                .then(response => {
+                    if (!response.ok) {
+                        missingFiles.push(file);
+                    }
+                })
+                .catch(() => {
+                    missingFiles.push(file);
+                });
+        });
+        
+        setTimeout(() => {
+            if (missingFiles.length === 0) {
+                test1.innerHTML = '<span class="success">✅ 所有必需文件都存在</span>';
+            } else {
+                test1.innerHTML = `<span class="error">❌ 缺少文件: ${missingFiles.join(', ')}</span>`;
+            }
+        }, 1000);
+        
+        // 测试2: 侧边栏配置检查
+        const test2 = document.getElementById('test2');
+        fetch('_sidebar.md')
+            .then(response => response.text())
+            .then(text => {
+                if (text.includes('# 📚 学区房研究项目导航') && text.includes('嘉定区小学')) {
+                    test2.innerHTML = '<span class="success">✅ 侧边栏配置正确</span>';
+                } else {
+                    test2.innerHTML = '<span class="error">❌ 侧边栏配置可能有问题</span>';
+                }
+            })
+            .catch(() => {
+                test2.innerHTML = '<span class="error">❌ 无法读取侧边栏文件</span>';
+            });
+        
+        // 测试3: 导航链接检查
+        const test3 = document.getElementById('test3');
+        test3.innerHTML = '<span class="success">✅ 请点击上方链接测试导航</span>';
+    </script>
+</body>
+</html>
