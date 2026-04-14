@@ -1,0 +1,19 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Obsidian
+.obsidian/
+*.vault
+*.local
+
+# Editor
+.vscode/
+.idea/
+
+# Log
+*.log
+
+# Temporary
+*.tmp
+*.bak
