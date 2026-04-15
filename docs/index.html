@@ -10,42 +10,132 @@
   <style>
     /* 自定义样式 */
     .sidebar {
-      width: 300px !important;
+      width: 320px !important;
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      border-right: 1px solid #dee2e6;
     }
     .app-name {
-      font-size: 1.5em;
+      font-size: 1.6em;
       font-weight: bold;
+      color: #2c3e50;
+      padding: 20px 15px;
+      border-bottom: 2px solid #42b983;
+      background: white;
     }
     .sidebar ul {
-      padding-left: 20px;
+      padding-left: 0;
     }
     .sidebar li {
-      margin: 5px 0;
+      margin: 2px 0;
     }
     .markdown-section {
       max-width: 1200px;
+      padding: 40px;
     }
+    
     /* 目录项样式 */
     .sidebar-nav li a {
-      padding: 8px 15px;
-      border-radius: 4px;
+      padding: 10px 20px;
+      border-radius: 6px;
       transition: all 0.3s;
+      display: block;
+      color: #495057;
+      font-weight: 500;
+      border-left: 3px solid transparent;
     }
     .sidebar-nav li a:hover {
-      background-color: #f5f5f5;
+      background-color: #e9ecef;
       color: #42b983;
+      border-left-color: #42b983;
+      transform: translateX(3px);
     }
+    
     /* 当前页面高亮 */
     .sidebar-nav li.active > a {
       background-color: #42b983;
       color: white !important;
+      border-left-color: #2c3e50;
+      font-weight: 600;
     }
-    /* 展开/收起箭头 */
-    .sidebar-nav li > .app-sub-sidebar::before {
-      content: '📁 ';
+    
+    /* 标题样式 */
+    .sidebar-nav h2, .sidebar-nav h3, .sidebar-nav h4 {
+      padding: 12px 20px;
+      margin: 10px 0 5px 0;
+      cursor: pointer;
+      color: #2c3e50;
+      font-weight: 600;
+      background: white;
+      border-radius: 6px;
+      border-left: 4px solid #42b983;
+      transition: all 0.3s;
+      position: relative;
     }
-    .sidebar-nav li.active > .app-sub-sidebar::before {
-      content: '📂 ';
+    .sidebar-nav h2:hover, .sidebar-nav h3:hover, .sidebar-nav h4:hover {
+      background: #f8f9fa;
+      transform: translateX(3px);
+    }
+    
+    /* 标题前的图标 */
+    .sidebar-nav h2::before, .sidebar-nav h3::before, .sidebar-nav h4::before {
+      content: '▶';
+      display: inline-block;
+      margin-right: 10px;
+      font-size: 0.8em;
+      transition: transform 0.3s;
+      color: #42b983;
+    }
+    
+    /* 展开状态的标题 */
+    .sidebar-nav h2.active::before, .sidebar-nav h3.active::before, .sidebar-nav h4.active::before {
+      transform: rotate(90deg);
+    }
+    
+    /* 子目录样式 */
+    .app-sub-sidebar {
+      padding-left: 20px;
+      border-left: 2px dashed #dee2e6;
+      margin-left: 20px;
+      transition: all 0.3s;
+    }
+    
+    /* 分隔线 */
+    hr {
+      margin: 20px 15px;
+      border: none;
+      border-top: 1px solid #dee2e6;
+    }
+    
+    /* 快速链接样式 */
+    .sidebar-nav li a[href*="github.com"],
+    .sidebar-nav li a[href*="pull"] {
+      background-color: #f8f9fa;
+      border: 1px solid #dee2e6;
+    }
+    
+    /* 响应式调整 */
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 280px !important;
+      }
+      .markdown-section {
+        padding: 20px;
+      }
+    }
+    
+    /* 滚动条样式 */
+    .sidebar::-webkit-scrollbar {
+      width: 8px;
+    }
+    .sidebar::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+    .sidebar::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 4px;
+    }
+    .sidebar::-webkit-scrollbar-thumb:hover {
+      background: #a8a8a8;
     }
   </style>
 </head>
@@ -56,13 +146,17 @@
       name: '上海嘉定区学区房研究项目',
       repo: 'lsr-flying/xuequfang-research',
       loadSidebar: true,
-      subMaxLevel: 4,
+      subMaxLevel: 6,
       auto2top: true,
+      coverpage: false,
+      maxLevel: 6,
+      themeColor: '#42b983',
       search: {
         paths: 'auto',
         placeholder: '搜索文档...',
         noData: '找不到相关结果',
-        depth: 4
+        depth: 6,
+        hideOtherSidebarContent: false
       },
       plugins: [
         function(hook, vm) {
@@ -78,18 +172,71 @@
               const currentPage = vm.route.path;
               const sidebarItems = document.querySelectorAll('.sidebar-nav li');
               
-              // 自动展开当前页面所在的目录
+              // 重置所有标题状态
+              const headings = document.querySelectorAll('.sidebar-nav h2, .sidebar-nav h3, .sidebar-nav h4');
+              headings.forEach(heading => {
+                heading.classList.remove('active');
+              });
+              
+              // 自动展开当前页面所在的目录并高亮
               sidebarItems.forEach(item => {
                 const link = item.querySelector('a');
                 if (link && link.getAttribute('href') === currentPage) {
+                  // 展开所有父级目录
                   let parent = item.parentElement;
-                  while (parent && parent.classList.contains('app-sub-sidebar')) {
-                    parent.style.display = 'block';
+                  while (parent) {
+                    if (parent.classList.contains('app-sub-sidebar')) {
+                      parent.style.display = 'block';
+                      // 找到对应的标题并标记为active
+                      let prevSibling = parent.previousElementSibling;
+                      while (prevSibling && !prevSibling.matches('h2, h3, h4')) {
+                        prevSibling = prevSibling.previousElementSibling;
+                      }
+                      if (prevSibling) {
+                        prevSibling.classList.add('active');
+                      }
+                    }
                     parent = parent.parentElement;
                   }
+                  
+                  // 高亮当前页面
+                  item.classList.add('active');
                 }
               });
-            }, 100);
+              
+              // 添加点击展开/收起功能到所有标题
+              headings.forEach(heading => {
+                // 移除旧的监听器
+                heading.removeEventListener('click', handleHeadingClick);
+                // 添加新的监听器
+                heading.addEventListener('click', handleHeadingClick);
+              });
+              
+              // 点击标题的处理函数
+              function handleHeadingClick(e) {
+                e.stopPropagation();
+                const nextSibling = this.nextElementSibling;
+                if (nextSibling && nextSibling.classList.contains('app-sub-sidebar')) {
+                  if (nextSibling.style.display === 'none' || nextSibling.style.display === '') {
+                    nextSibling.style.display = 'block';
+                    this.classList.add('active');
+                  } else {
+                    nextSibling.style.display = 'none';
+                    this.classList.remove('active');
+                  }
+                }
+              }
+              
+              // 默认展开第一级目录
+              const firstLevelHeadings = document.querySelectorAll('.sidebar-nav > ul > li > h2');
+              firstLevelHeadings.forEach(heading => {
+                const nextSibling = heading.nextElementSibling;
+                if (nextSibling && nextSibling.classList.contains('app-sub-sidebar')) {
+                  nextSibling.style.display = 'block';
+                  heading.classList.add('active');
+                }
+              });
+            }, 300);
           });
         }
       ]
